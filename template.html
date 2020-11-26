@@ -1,0 +1,60 @@
+<head>
+  <link href="https://vjs.zencdn.net/7.8.4/video-js.css" rel="stylesheet" />
+</head>
+
+<body>
+  <video
+    style="width: 100%; height: 100%"
+    id="my-player"
+    class="video-js vjs-default-skin"
+    fluid
+    controls
+  >
+    <p class="vjs-no-js">
+      To view this video please enable JavaScript, and consider upgrading to a
+      web browser that
+      <a href="https://videojs.com/html5-video-support/" target="_blank"
+        >supports HTML5 video</a
+      >
+    </p>
+  </video>
+  <script src="https://vjs.zencdn.net/7.8.4/video.js"></script>
+
+  <!-- Include other videojs plugin files here -->
+  <script src="https://src.litix.io/videojs/3/videojs-mux.js"></script>
+  <script>
+    // Record the player init time
+    var playerInitTime = Date.now();
+
+    try {
+      player = videojs("my-player", {
+        errorDisplay: false,
+        plugins: {
+          mux: {
+            debug: true,
+            respectDoNotTrack: true, // Disable tracking of browsers where Do Not Track is enabled
+            data: {
+              env_key: "MUX_ENV_KEY", // required
+
+              // Metadata
+              player_init_time: playerInitTime, // ex: 1451606400000
+              video_id: "VIDEO_ID",
+              // ... and other metadata
+            },
+          },
+        },
+      });
+    } catch (e) {
+      player = videojs("my-player",{
+        errorDisplay: false
+      });
+    }
+
+    player.src({
+      src: "VIDEO_SRC",
+      type: "application/x-mpegURL",
+    });
+
+    player.play();
+  </script>
+</body>
