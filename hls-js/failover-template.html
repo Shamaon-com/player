@@ -1,0 +1,79 @@
+<html>
+<head>
+    <!-- <link href="./controls.css" rel="stylesheet" /> -->
+    <style>
+        video {
+            background-color: rgba(0, 0, 0, 0.712);
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <script src="./controls.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/0.14.16/hls.js"></script>
+    <script src="https://src.litix.io/core/3/mux.js"></script>
+    <video height="100%" width="100%" id="video"></video>
+    <!--
+    <div id="video-container">
+        <div id="video-controls">
+            <button type="button" id="play-pause">Play</button>
+            <button type="button" id="mute">Mute</button>
+            <input type="range" id="volume-bar" min="0" max="1" step="0.1" value="1">
+            <button type="button" id="full-screen">Full-Screen</button>
+        </div>
+    </div>
+    -->
+    <script>
+        var primary = 'https://fra-cdn.livepeer.com/hls/5a11hmqafea11jfd/index.m3u8';
+        var secondary = 'https://mdw-cdn.livepeer.com/hls/5a11hmqafea11jfd/index.m3u8';
+        var playbackUrl = primary;
+        if (Hls.isSupported()) {
+            var video = document.getElementById('video');
+            var hls = new Hls({
+                debug: false,
+            });
+
+            hls.loadSource(playbackUrl);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+                video.muted = true;
+                video.controls = false;
+                video.play();
+            });
+
+            hls.on(Hls.Events.ERROR, function (eventName, data) {
+                if (playbackUrl == primary) {
+                    console.log("Loading secondary")
+                    playbackUrl = secondary;
+                    hls.loadSource(playbackUrl);
+                    hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+                        video.muted = true;
+                        video.controls = true;
+                        video.play();
+                    });
+                }
+                else {
+                    video.controls = false;
+                }
+            });
+            console.log(video);
+            console.log(video.tech().vhs.playlists.media());
+        }
+        if (typeof mux !== 'undefined') {
+            mux.monitor('#video', {
+                debug: false,
+                // Pass in the HLS.js instance
+                hlsjs: hls,
+                data: {
+                    env_key: "1lgdh87bv14j6bhv83buspkj3",
+                    // Metadata
+                    player_init_time: playerInitTime,
+                    video_id: "676360da-5c54-4313-a247-f6eae8c9645e",
+                }
+            });
+        }
+    </script>
+</body>
+</html>

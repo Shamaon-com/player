@@ -1,5 +1,6 @@
 <head>
   <link href="https://vjs.zencdn.net/7.8.4/video-js.css" rel="stylesheet" />
+  
 </head>
 
 <body>
@@ -45,7 +46,7 @@
         },
       });
     } catch (e) {
-      player = videojs("my-player",{
+      player = videojs("my-player", {
         errorDisplay: false
       });
     }
@@ -56,5 +57,10 @@
     });
 
     player.play();
+    
+    player.on('error', function() {
+      console.log(player.error());
+    });
+
   </script>
 </body>
