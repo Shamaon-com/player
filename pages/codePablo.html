@@ -1,0 +1,154 @@
+<html>
+
+<head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+  <meta content="utf-8" http-equiv="encoding">
+  <link href="https://vjs.zencdn.net/7.8.4/video-js.css" rel="stylesheet" />
+  <style>
+    .noSrc {
+      width: 100%;
+      height: 100%;
+      background-image: url();
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    p {
+      color: #ffffff;
+      text-align: center;
+      font-size: 20px;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    .videoStyle{
+      width: 100%; height: 100%;
+    }
+
+  </style>
+
+
+  <!-- Matomo -->
+  <script type="text/javascript">
+    var _paq = window._paq = window._paq || [];
+    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function () {
+      var u = "https://shamaon.matomo.cloud/";
+      _paq.push(['setTrackerUrl', u + 'matomo.php']);
+      _paq.push(['setSiteId', '2']);
+      var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+      g.type = 'text/javascript'; g.async = true; g.src = '//cdn.matomo.cloud/shamaon.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g, s);
+    })();
+  </script>
+  <!-- End Matomo Code -->
+
+
+</head>
+
+<body>
+  <div id="videoContainer">
+  </div>
+  <div class="noSrc" id="noSrc">
+    <p>El streaming esta offline</p>
+  </div>
+</body>
+
+<script src="https://vjs.zencdn.net/7.8.4/video.js"></script>
+
+<script>
+  const sources = ["src one", "src two"];
+
+  var video = null;
+  var noSrcDiv = document.getElementById("noSrc");
+  var player = null;
+
+  async function loadSrc() {
+    try{
+      for (src in sources) {
+        checkSource(sources[src]);
+      }
+    }catch(e){
+      console.log(e)
+      clearInterval(myInterval);
+    }
+  }
+
+  function parseRequest(data) {
+    const text = data;
+    var pos = text.split("\n");
+    if (pos[1] == "#EXT-X-ERROR: Stream open failed\r") {
+      return false;
+    }
+    return true;
+  }
+
+  async function checkSource(src) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', src, true);  // `false` makes the request synchronous
+
+    xhr.onload = function (e) {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          if (!parseRequest(xhr.responseText)) {
+              disposePlayer(src);
+          }else if(player === null){
+            buildPlayer(src);
+          }
+        }
+      } else {
+        console.error(xhr.statusText);
+        disposePlayer();
+      }
+    }
+    xhr.onerror = function (e) {
+      console.error(xhr.statusText);
+      disposePlayer();
+    };
+    xhr.send(null);
+  };
+
+  function disposePlayer(src){
+    if(player !== null && player.currentSrc() === src){
+      console.log("trying to dispose", src);
+      player.dispose();
+      noSrcDiv.style.display = "block";
+      player = null;
+    }
+  }
+
+  function buildPlayer(src) {
+    rebuildVideoComponent();
+    console.log("building player", src);
+    player = videojs("videoestudio");
+    player.src({
+      src: src,
+      type: "application/x-mpegURL",
+    });
+    noSrcDiv.style.display = "none";
+  }
+
+  function rebuildVideoComponent(){
+    const contaier = document.getElementById("videoContainer");
+
+    video = document.createElement('video-js');
+    video.id = 'videoestudio';
+    video.className = 'videoStyle video-js vjs-default-skin';
+    video.setAttribute('controls', 'controls');
+    video.setAttribute('data-matomo-title', 'videoestudio_icea-19-enero');
+
+    contaier.appendChild(video);
+  }
+
+
+  loadSrc();
+  setTimeout(function tick() {
+    loadSrc();
+    timerId = setTimeout(tick, 15000); 
+  }, 15000);
+
+
+</script>
+
+</html>
