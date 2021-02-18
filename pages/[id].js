@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router'
 import VideoPlayer from '../components/videoPlayer'
+import { unstable_batchedUpdates } from 'react-dom';
 
 export default function Home() {
   const [sources,setSources] = useState([{id:1 , src:"source 1"}, {id:2 , src:"source 2"},{id:3 , src:"source 3"}, {id:4 , src:"source 4"},]);
@@ -37,7 +38,7 @@ export default function Home() {
       autoplay: true,
       controls: true,
       sources: [{
-        src: 'qwd',
+        src: currentSrc.src,
         type: 'application/x-mpegURL'
       }]
     }
@@ -47,7 +48,7 @@ export default function Home() {
     
     return (
       <>
-      {currentSrc && <div> </div>  }
+      {currentSrc && <VideoPlayer {...buildObject()}/>}
       </>
     )
   }
