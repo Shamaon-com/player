@@ -23,7 +23,7 @@ export default class VideoPlayer extends React.Component {
     return (
       <>	
         <div data-vjs-player className="w-full h-full">
-          <video  ref={ node => this.videoNode = node } className="video-js w-full h-full"></video>
+          <video  ref={ node => this.videoNode = node } className="video-js w-full h-full vjs-big-play-centered"></video>
         </div>
       </>
     )
