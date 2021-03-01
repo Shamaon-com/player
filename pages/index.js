@@ -1,151 +1,84 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router'
-import VideoPlayerNew from '../components/videoPlayerNew'
-
-export default function Home() {
-  const [sources, setSources] = useState([
-    { type: "master", src: "https://fra-cdn.livepeer.com/hls/" },
-    { type: "failover", src: "https://lon-cdn.livepeer.com/hls/" },
-  ]);
-
-  const router = useRouter();
-  const [currentSrc, setCurrentSrc] = useState({});
-  const [switcher, setSwitcher] = useState(false);
-
-  useEffect(() => {
-    console.log(router.query)
-    const{id} = router.query;
-    if (id !== undefined) {
-      const { id, failover } = router.query;
-
-      genSources(id, failover);
-    }
-  }, [router.query])
-
-  async function genSources(idIncoming, failover) {
-    if (idIncoming !== null && failover !== null) {
-      const newSrc = sources.map((item) => {
-        if (item.type == "master") {
-          return {
-            type: item.type,
-            src: item.src + idIncoming + "/index.m3u8",
-          }
-        } else if (item.type == "failover") {
-          return {
-            type: item.type,
-            src: item.src + failover + "/index.m3u8",
-          }
-        }
-      })
-      setSources(newSrc);
-    }
-  }
-
-  useEffect(() => {
-    loadSrc();
-  }, [sources])
+import React, { useState, useEffect } from "react"
 
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      loadSrc();
-    }, 30000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [sources]);
+export default function Login() {
+ 
+  const [fields, handleFieldsChange] = useFormFields({
+    id: "",
+    failover: "",
+  
+  })
 
-  async function loadSrc() {
-    try {
-      sources.map((item) => {
-        checkSource(item);
-      })
-      if (!currentSrc) {
-        setSwitcher(false);
+  const validate = () => {
+    console.log(fields);
+    for(let field in fields){
+      if(fields[field] === ""){
+        alert("Porfavor rellene todos los campos");
+        return false
       }
-    } catch (e) {
-      console.log(e)
     }
-  }
-
-  async function checkSource(item) {
-    fetch(item.src)
-      .then(
-        function (response) {
-          console.log(response);
-          if (response.status !== 200) {
-            console.log("status code: ", response.status);
-            setSwitcher(false);
-            return;
-          }
-          response.text().then(function (data) {
-            if (parseRequest(data) && currentSrc !== null) {
-              setCurrentSrc(item)
-              setSwitcher(true)
-            } else {
-              setSwitcher(false)
-              setCurrentSrc(null)
-            }
-          });
-        }
-      )
-      .catch(function (err) {
-        console.log('Fetch Error :-S', err);
-      });
-
-  }
-
-  function parseRequest(data) {
-    const text = data;
-    var pos = text.split("\n");
-    if (pos[1] == "#EXT-X-ERROR: Stream open failed\r") {
-      return false;
-    }
-    return true;
-  }
-
- function recordingRequest(data){
-  const text = data;
-  if (data.record === "false"){
-    return false;
-  } else{
     return true
   }
- }
 
-  // creating video object
-  const buildObject = () => {
-    return {
-      videoSrc: [{
-        src: currentSrc.src,
-        type: 'application/x-mpegURL'
-      }]
-    }
+
+  //Sing up function
+  function useFormFields(initialState) {
+    const [fields, setValues] = useState(initialState);
+
+    return [
+      fields,
+      function (event) {
+        setValues({
+          ...fields,
+          [event.target.id]: event.target.value,
+        });
+      }
+    ];
   }
 
-  // display renders for player 
+  // Function render Sing up form
 
-  const renderNoSrc = () => {
+  const renderSignUp = () => {
     return (
-      <div>
-        El streaming esta offline
+      <div class="flex justify-center w-full">
+        <div class="max-w-md shadow w-full bg-white rounded px-8 pt-6 pb-8 mb-4">
+          <div class="mb-4">
+            <label class="block text-grey-darker text-sm font-bold mb-2" >
+                id
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+              id="id"
+              type="text"
+              placeholder="id"
+              value={fields.id}
+              onChange={handleFieldsChange}
+            />
+          </div>
+          <div class="mb-4 flex flex-col">
+            <label class="text-grey-darker text-sm font-bold mb-2">
+                failover
+              </label>
+            <input class="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" type="text" placeholder="failover"
+              id="failover"
+              value={fields.failover}
+              onChange={handleFieldsChange}
+            />
+          </div>
+          <a class={`bg-blue-500 text-white w-full font-bold py-2 px-4 mb-3 `} href={`/video?id=${fields.id}&?failover=${fields.failover}`}>
+            go
+          </a>
+        </div>
       </div>
     )
   }
 
-  const renderVideoPlayer = () => {
-    return (
-      <>
-        {<VideoPlayerNew {...buildObject()} />}
-      </>
-    )
-  }
-
   return (
-    <div className="w-screen h-screen">
-      {switcher ? renderVideoPlayer() : renderNoSrc()}
+    <div className="w-full h-screen ">
+      <div className="w-full h-full flex items-center justify-center">
+        {renderSignUp()}
+      </div>
     </div>
-
   )
 }
+
 
