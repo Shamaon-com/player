@@ -15,21 +15,46 @@ export default function Home() {
   useEffect(() => {
     
     const {id, failover} = parseQuery(router.asPath.split("?")[1]);
-    console.log(id,failover)
-    console.log(parseQuery(router.asPath))
+    console.log("parsed id, faliover", id,failover)
     if (validate(id, failover)) {
-      genSources(id, failover);
+      initPlayerSrc(id, failover);
     } else {
       router.push("/")
     }
   }, [])
 
-  function validate(idIncoming, failover) {
-    if (idIncoming == null || failover == null) {
+
+  async function initPlayerSrc(id, failover) {
+    const newSrc = sources.map((item) => {
+      if (item.type == "master") {
+        return {
+          type: item.type,
+          src: item.src + id + "/index.m3u8",
+        }
+      } else if (item.type == "failover") {
+        return {
+          type: item.type,
+          src: item.src + failover + "/index.m3u8",
+        }
+      }
+    })
+    loadSrc(newSrc);
+    const interval = setInterval(() => {
+      console.log("Settings interval to 30 sec")
+      loadSrc(newSrc);
+    }, 30000);
+    return () => {
+      clearInterval(interval);
+    };
+  }
+
+
+  function validate(id, failover) {
+    if (id == null || failover == null) {
       return false;
-    } else if (idIncoming == undefined || failover == undefined) {
+    } else if (id == undefined || failover == undefined) {
       return false;
-    } else if (idIncoming == "" || failover == "") {
+    } else if (id == "" || failover == "") {
       return false;
     }
     return true;
@@ -45,57 +70,23 @@ export default function Home() {
     return query;
 }
 
-  async function genSources(idIncoming, failover) {
-    console.log(idIncoming, failover);
-
-    const newSrc = sources.map((item) => {
-      if (item.type == "master") {
-        return {
-          type: item.type,
-          src: item.src + idIncoming + "/index.m3u8",
-        }
-      } else if (item.type == "failover") {
-        return {
-          type: item.type,
-          src: item.src + failover + "/index.m3u8",
-        }
-      }
-    })
-    setSources(newSrc);
-  }
-
-  useEffect(() => {
-    loadSrc();
-  }, [sources])
 
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      loadSrc();
-    }, 30000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [sources]);
-
-  async function loadSrc() {
+  async function loadSrc(newSrc) {
     try {
-      sources.map((item) => {
+      newSrc.map((item) => {
         checkSource(item);
       })
-      if (!currentSrc) {
-        setSwitcher(false);
-      }
     } catch (e) {
       console.log(e)
     }
   }
 
   async function checkSource(item) {
+    console.log("Loading", item)
     fetch(item.src)
       .then(
         function (response) {
-          console.log(response);
           if (response.status !== 200) {
             console.log("status code: ", response.status);
             setSwitcher(false);
@@ -103,12 +94,12 @@ export default function Home() {
           }
           response.text().then(function (data) {
             if (parseRequest(data) && currentSrc !== null) {
-              console.log("update")
               setCurrentSrc(item)
               setSwitcher(true)
             } else {
-              setSwitcher(false)
-              setCurrentSrc(null)
+              console.log("parsed failed", item.src);
+              setSwitcher(false);
+              setCurrentSrc(null);
             }
           });
         }
