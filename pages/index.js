@@ -40,13 +40,13 @@ export default function Login() {
 
   const renderSignUp = () => {
     return (
-      <div class="flex justify-center w-full">
-        <div class="max-w-md shadow w-full bg-white rounded px-8 pt-6 pb-8 mb-4">
-          <div class="mb-4">
-            <label class="block text-grey-darker text-sm font-bold mb-2" >
+      <div className="flex justify-center w-full">
+        <div className="max-w-md shadow w-full bg-white rounded px-8 pt-6 pb-8 mb-4">
+          <div className="mb-4">
+            <label className="block text-grey-darker text-sm font-bold mb-2" >
                 id
             </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+            <input className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
               id="id"
               type="text"
               placeholder="id"
@@ -54,17 +54,17 @@ export default function Login() {
               onChange={handleFieldsChange}
             />
           </div>
-          <div class="mb-4 flex flex-col">
-            <label class="text-grey-darker text-sm font-bold mb-2">
+          <div className="mb-4 flex flex-col">
+            <label className="text-grey-darker text-sm font-bold mb-2">
                 failover
               </label>
-            <input class="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" type="text" placeholder="failover"
+            <input className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" type="text" placeholder="failover"
               id="failover"
               value={fields.failover}
               onChange={handleFieldsChange}
             />
           </div>
-          <a class={`bg-blue-500 text-white w-full font-bold py-2 px-4 mb-3 `} href={`/video?id=${fields.id}&?failover=${fields.failover}`}>
+          <a className={`bg-blue-500 text-white w-full font-bold py-2 px-4 mb-3 `} href={`/video?id=${fields.id}&failover=${fields.failover}`}>
             go
           </a>
         </div>
