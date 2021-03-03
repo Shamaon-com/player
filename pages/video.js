@@ -1,52 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router'
 import VideoPlayerNew from '../components/videoPlayerNew'
+import axios from 'axios';
 
 export default function Home() {
   const [sources, setSources] = useState([
-    { type: "master", src: "https://fra-cdn.livepeer.com/hls/" },
-    { type: "failover", src: "https://lon-cdn.livepeer.com/hls/" },
+    { type: "master", src: "https://fra-cdn.livepeer.com/hls", status: "off" },
+    { type: "failover", src: "https://lon-cdn.livepeer.com/hls", status: "off" },
   ]);
-
+  const [updates, setUpdates] = useState(0)
   const router = useRouter();
-  const [currentSrc, setCurrentSrc] = useState({});
-  const [switcher, setSwitcher] = useState(false);
+
 
   useEffect(() => {
     
-    const {id, failover} = parseQuery(router.asPath.split("?")[1]);
-    console.log("parsed id, faliover", id,failover)
-    if (validate(id, failover)) {
-      initPlayerSrc(id, failover);
+    const {main, failover} = parseQuery(router.asPath.split("?")[1]);
+
+    console.log("trigger useEffect")
+    if (validate(main, failover)) {
+      initializeSources(main, failover);
     } else {
       router.push("/")
     }
   }, [])
 
 
-  async function initPlayerSrc(id, failover) {
-    const newSrc = sources.map((item) => {
-      if (item.type == "master") {
-        return {
-          type: item.type,
-          src: item.src + id + "/index.m3u8",
-        }
-      } else if (item.type == "failover") {
-        return {
-          type: item.type,
-          src: item.src + failover + "/index.m3u8",
-        }
+  const initializeSources = (main, failover) => {
+    sources.map((item, index) => {
+      const source = {
+        type: item.type,
+        src: `${item.src}/${item.type === "master" ? main : failover}/index.m3u8`,
+        status: 'pending'
       }
-    })
-    loadSrc(newSrc);
-    const interval = setInterval(() => {
-      console.log("Settings interval to 30 sec")
-      loadSrc(newSrc);
-    }, 30000);
-    return () => {
-      clearInterval(interval);
-    };
+      fetchSourcePlaylist(source, index);
+      return source;
+    });
+  };
+
+
+  const fetchSourcePlaylist = async (source, index) => {
+    var intermediate = sources;
+    intermediate[index].src = source.src;
+
+    axios.get(source.src).then(function(response){
+      if(parseSourcePlaylist(response.data)){
+        intermediate[index].status = "available";
+      }else{
+        intermediate[index].status = "noOutput";
+      }
+    }).catch(function(error){
+      intermediate[index].status = "error";
+      console.log(error);
+    });
+    console.log([...intermediate])
+    setSources([...intermediate])
   }
+
 
 
   function validate(id, failover) {
@@ -68,49 +77,9 @@ export default function Home() {
         query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
     }
     return query;
-}
-
-
-
-  async function loadSrc(newSrc) {
-    try {
-      newSrc.map((item) => {
-        checkSource(item);
-      })
-    } catch (e) {
-      console.log(e)
-    }
   }
 
-  async function checkSource(item) {
-    console.log("Loading", item)
-    fetch(item.src)
-      .then(
-        function (response) {
-          if (response.status !== 200) {
-            console.log("status code: ", response.status);
-            setSwitcher(false);
-            return;
-          }
-          response.text().then(function (data) {
-            if (parseRequest(data) && currentSrc !== null) {
-              setCurrentSrc(item)
-              setSwitcher(true)
-            } else {
-              console.log("parsed failed", item.src);
-              setSwitcher(false);
-              setCurrentSrc(null);
-            }
-          });
-        }
-      )
-      .catch(function (err) {
-        console.log('Fetch Error :-S', err);
-      });
-
-  }
-
-  function parseRequest(data) {
+  function parseSourcePlaylist(data) {
     const text = data;
     var pos = text.split("\n");
     if (pos[1] == "#EXT-X-ERROR: Stream open failed\r") {
@@ -119,27 +88,8 @@ export default function Home() {
     return true;
   }
 
-  function recordingRequest(data) {
-    const text = data;
-    if (data.record === "false") {
-      return false;
-    } else {
-      return true
-    }
-  }
-
-  // creating video object
-  const buildObject = () => {
-    return {
-      videoSrc: [{
-        src: currentSrc.src,
-        type: 'application/x-mpegURL'
-      }]
-    }
-  }
 
   // display renders for player 
-
   const renderNoSrc = () => {
     return (
       <div>
@@ -149,16 +99,19 @@ export default function Home() {
   }
 
   const renderVideoPlayer = () => {
-    return (
-      <>
-        {<VideoPlayerNew {...buildObject()} />}
-      </>
-    )
+    console.log("render player")
+    for( var i = 0; i < sources.length; i++){
+      console.log(sources[i])
+      if(sources[i].status === "available"){
+        return <VideoPlayerNew source={sources[i]} index={i} fetchSourcePlaylist={fetchSourcePlaylist} />
+      }
+    }
+    return renderNoSrc();
   }
 
   return (
     <div className="w-screen h-screen">
-      {switcher ? renderVideoPlayer() : renderNoSrc()}
+      {renderVideoPlayer()}
     </div>
 
   )

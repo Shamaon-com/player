@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react"
 
+import * as gtag from '../lib/gtag'
+
+
 
 export default function Login() {
  
@@ -36,8 +39,16 @@ export default function Login() {
     ];
   }
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    gtag.event({
+      action: 'submit_form',
+      category: 'Contact',
+      label: "this is a test",
+    })
+  }
+  
   // Function render Sing up form
-
   const renderSignUp = () => {
     return (
       <div className="flex justify-center w-full">
@@ -64,9 +75,12 @@ export default function Login() {
               onChange={handleFieldsChange}
             />
           </div>
-          <a className={`bg-blue-500 text-white w-full font-bold py-2 px-4 mb-3 `} href={`/video?id=${fields.id}&failover=${fields.failover}`}>
+          <a className={`bg-blue-500 text-white w-full font-bold py-2 px-4 mb-3 `} href={`/video?main=${fields.id}&failover=${fields.failover}`}>
             go
           </a>
+          <button onClick={handleSubmit}>
+            test
+          </button>
         </div>
       </div>
     )
