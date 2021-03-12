@@ -9,6 +9,7 @@ export default function VideoPlayerNew(props) {
   const playerRef = useRef();
 
   useEffect(() => {
+
     const player = videojs(playerRef.current, { controls: true, autoplay: false, muted: true }, () => {
       player.src({
         src: props.source.src,
@@ -16,9 +17,11 @@ export default function VideoPlayerNew(props) {
       });
     });
 
+    player.play();
+
     player.on(['play', 'durationchange', 'stalled', 'ended', 'seeking', 'seeked', 'waiting', 'playing', 'pause', 'volumechange'],
       function (data) {
-        console.log(data)
+        //console.log(data)
         gtag.event({
           action: data.type,
           category: 'Videos',
@@ -27,19 +30,26 @@ export default function VideoPlayerNew(props) {
         })
     });
 
-    player.on(['error', 'waiting', 'durationchange'], function (data) {
-      console.log(data)
-      props.fetchSourcePlaylist(props.source, props.index);
+    player.on(['error', 'durationchange', 'waiting'], function (data) {
+      //console.log(data)
+      //props.fetchSourcePlaylist(props.source, props.index);
+      props.initializeSources()
     });
 
     return () => {
+      console.log("dispose");
       player.dispose();
     };
   }, []);
 
+  const loadVideoComponent = () => {
+    console.log("Building for", props.source.src)
+    return <video ref={playerRef} className="video-js vjs-16-9 w-full h-full vjs-big-play-centered" />
+
+  }
   return (
     <div data-vjs-player className="w-full h-full">
-      <video ref={playerRef} className="video-js vjs-16-9 w-full h-full vjs-big-play-centered" />
+      {loadVideoComponent() }
     </div>
   );
 }

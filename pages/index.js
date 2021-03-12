@@ -1,98 +1,138 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router'
+import VideoPlayerNew from '../components/videoPlayerNew'
+import axios from 'axios';
 
-import * as gtag from '../lib/gtag'
+export default function Home() {
+  const [sources, setSources] = useState([
+    { type: "master", src: "https://fra-cdn.livepeer.com/hls", status: "off" },
+    { type: "failover", src: "https://lon-cdn.livepeer.com/hls", status: "off" },
+  ]);
 
 
 
-export default function Login() {
- 
-  const [fields, handleFieldsChange] = useFormFields({
-    id: "",
-    failover: "",
-  
-  })
+  useEffect(() => {
+    /*
+    const {main, failover} = parseQuery(router.asPath.split("?")[1]);
 
-  const validate = () => {
-    console.log(fields);
-    for(let field in fields){
-      if(fields[field] === ""){
-        alert("Porfavor rellene todos los campos");
-        return false
-      }
+    console.log("trigger useEffect")
+    if (validate(main, failover)) {
+      initializeSources(main, failover);
+    } else {
+      router.push("/")
     }
-    return true
-  }
+
+    */
+
+    const main = "3f82w8e75tfe09gg";
+    const failover = "49f6y2m5144phuf7";
+    initializeSources();
+  }, [])
 
 
-  //Sing up function
-  function useFormFields(initialState) {
-    const [fields, setValues] = useState(initialState);
+  useEffect(() => {
+    setInterval(() => {
+      console.log("Settings interval to 30 sec")
+      initializeSources();
+    }, 30000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [])
 
-    return [
-      fields,
-      function (event) {
-        setValues({
-          ...fields,
-          [event.target.id]: event.target.value,
-        });
+  const initializeSources = () => {
+    const main = "https://fra-cdn.livepeer.com/hls/3f82w8e75tfe09gg/index.m3u8";
+    const failover = "https://lon-cdn.livepeer.com/hls/49f6y2m5144phuf7/index.m3u8";
+    sources.map((item, index) => {
+      const source = {
+        type: item.type,
+        src: `${item.type === "master" ? main : failover}`,
+        status: 'pending'
       }
-    ];
+      fetchSourcePlaylist(source, index);
+      return source;
+    });
+  };
+
+
+
+  const fetchSourcePlaylist = (source, index) => {
+    var intermediate = sources;
+    intermediate[index].src = source.src;
+
+    axios.get(source.src).then(function(response){
+      if(parseSourcePlaylist(response.data)){
+        intermediate[index].status = "available";
+      }else{
+        intermediate[index].status = "noOutput";
+      }
+      setSources([...intermediate])
+    }).catch(function(error){
+      intermediate[index].status = "error";
+      console.log(error);
+      setSources([...intermediate])
+    });  
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    gtag.event({
-      action: 'submit_form',
-      category: 'Contact',
-      label: "this is a test",
-    })
+
+
+  function validate(id, failover) {
+    if (id == null || failover == null) {
+      return false;
+    } else if (id == undefined || failover == undefined) {
+      return false;
+    } else if (id == "" || failover == "") {
+      return false;
+    }
+    return true;
   }
-  
-  // Function render Sing up form
-  const renderSignUp = () => {
+
+  function parseQuery(queryString) {
+    var query = {};
+    var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
+    for (var i = 0; i < pairs.length; i++) {
+        var pair = pairs[i].split('=');
+        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+    }
+    return query;
+  }
+
+  function parseSourcePlaylist(data) {
+    const text = data;
+    var pos = text.split("\n");
+    if (pos[1] == "#EXT-X-ERROR: Stream open failed\r") {
+      return false;
+    }
+    return true;
+  }
+
+
+  // display renders for player 
+  const renderNoSrc = () => {
     return (
-      <div className="flex justify-center w-full">
-        <div className="max-w-md shadow w-full bg-white rounded px-8 pt-6 pb-8 mb-4">
-          <div className="mb-4">
-            <label className="block text-grey-darker text-sm font-bold mb-2" >
-                id
-            </label>
-            <input className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-              id="id"
-              type="text"
-              placeholder="id"
-              value={fields.id}
-              onChange={handleFieldsChange}
-            />
-          </div>
-          <div className="mb-4 flex flex-col">
-            <label className="text-grey-darker text-sm font-bold mb-2">
-                failover
-              </label>
-            <input className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" type="text" placeholder="failover"
-              id="failover"
-              value={fields.failover}
-              onChange={handleFieldsChange}
-            />
-          </div>
-          <a className={`bg-blue-500 text-white w-full font-bold py-2 px-4 mb-3 `} href={`/video?main=${fields.id}&failover=${fields.failover}`}>
-            go
-          </a>
-          <button onClick={handleSubmit}>
-            test
-          </button>
-        </div>
+      <div className="bg-black h-full">
+        <p className="text-center text-white">El streaming esta offline</p>
       </div>
     )
   }
 
+  const renderVideoPlayer = () => {
+
+    console.log("trying to build player")
+    console.log(sources)
+    for (var i = 0; i < sources.length; i++) {
+      if (sources[i].status === "available") {
+        return <VideoPlayerNew key={i} source={sources[i]} index={i} initializeSources={initializeSources} />
+      }
+    }
+    return renderNoSrc();
+  }
+  
   return (
-    <div className="w-full h-screen ">
-      <div className="w-full h-full flex items-center justify-center">
-        {renderSignUp()}
-      </div>
+    <div className="w-screen h-screen">
+      {renderVideoPlayer()}
     </div>
+
   )
 }
-
 
