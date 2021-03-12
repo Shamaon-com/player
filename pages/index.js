@@ -129,7 +129,7 @@ export default function Home() {
   }
   
   return (
-    <div className="w-screen h-screen">
+    <div className="w-full h-screen">
       {renderVideoPlayer()}
     </div>
 

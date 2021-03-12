@@ -44,7 +44,7 @@ export default function VideoPlayerNew(props) {
 
   const loadVideoComponent = () => {
     console.log("Building for", props.source.src)
-    return <video ref={playerRef} className="video-js vjs-16-9 w-full h-full vjs-big-play-centered" />
+    return <video ref={playerRef} className="video-js  w-full h-full vjs-big-play-centered" />
 
   }
   return (
