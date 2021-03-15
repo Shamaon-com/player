@@ -9,22 +9,11 @@ export default function Home() {
     { type: "failover", src: "https://lon-cdn.livepeer.com/hls", status: "off" },
   ]);
 
-  const Background = "/cartela.png";
+  const Background = "";
 
 
 
   useEffect(() => {
-    /*
-    const {main, failover} = parseQuery(router.asPath.split("?")[1]);
-
-    console.log("trigger useEffect")
-    if (validate(main, failover)) {
-      initializeSources(main, failover);
-    } else {
-      router.push("/")
-    }
-
-    */
 
     const main = "2223dfsfy7aartu";
     const failover = "d6d6dhc7y2eut5zf";

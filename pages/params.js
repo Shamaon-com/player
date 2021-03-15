@@ -31,6 +31,15 @@ export default function Home() {
 
     if(validate(main, failover)){
       initializeSources(main, failover);
+
+
+      setInterval(() => {
+        console.log("Settings interval to 30 sec")
+        initializeSources(main, failover);
+      }, 30000);
+      return () => {
+        clearInterval();
+      };
     }
 
   }, [main, failover])
