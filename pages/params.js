@@ -114,16 +114,20 @@ export default function Home() {
   // display renders for player 
   const renderNoSrc = () => {
     return (
-      <div className="bg-black h-full"
-      style={{backgroundImage: "url(" + Background + ")",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "cover"}}
+      <div 
+        style={{
+          height: "100vh",
+          backgroundImage: "url(" + Background + ")",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover"
+        }}
       >
-        <p className="text-center text-white">El streaming esta offline</p>
+        <p style={{margin: "0px", textAlign: "center"}}>El streaming esta offline</p>
       </div>
     )
   }
 
+  //https://rework.dtbfvdqj3z1vk.amplifyapp.com/params.html?main=d2cd773eb6wmcph8&failover=97845ve1il1tavab
   const renderVideoPlayer = () => {
 
     console.log("trying to build player")
@@ -137,7 +141,7 @@ export default function Home() {
   }
   
   return (
-    <div className="w-full h-screen"
+    <div style={{ widht:"100%"}}
     >
       {renderVideoPlayer()}
     </div>

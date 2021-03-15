@@ -125,7 +125,7 @@ export default function Home() {
   }
   
   return (
-    <div className="w-full h-screen"
+    <div style={{height:"100vh", minHeight: "100vh"}}
     >
       {renderVideoPlayer()}
     </div>

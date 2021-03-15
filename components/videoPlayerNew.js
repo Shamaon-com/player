@@ -10,11 +10,15 @@ export default function VideoPlayerNew(props) {
 
   useEffect(() => {
 
-    const player = videojs(playerRef.current, { controls: true, autoplay: false, muted: true }, () => {
-      player.src({
-        src: props.source.src,
-        type: 'application/x-mpegURL'
-      });
+    const player = videojs(playerRef.current, { 
+      
+      controls: true, 
+      poster: "https://iframes-shamaon.s3-eu-west-1.amazonaws.com/cartelas/catela_eres.png", 
+      autoplay: false, muted: true }, () => {
+        player.src({
+          src: props.source.src,
+          type: 'application/x-mpegURL',
+        });
     });
 
     player.play();
@@ -44,11 +48,11 @@ export default function VideoPlayerNew(props) {
 
   const loadVideoComponent = () => {
     console.log("Building for", props.source.src)
-    return <video ref={playerRef} className="video-js  w-full h-full vjs-big-play-centered" />
+    return <video ref={playerRef}  className="video-js vjs-big-play-centered" />
 
   }
   return (
-    <div data-vjs-player className="w-full h-full">
+    <div data-vjs-player style={{width: "100%", height: "100vh"}}>
       {loadVideoComponent() }
     </div>
   );

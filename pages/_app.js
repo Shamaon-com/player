@@ -1,6 +1,5 @@
-import "tailwindcss/tailwind.css";
 import "video.js/dist/video-js.css";
-
+import '../styles.css';
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import * as gtag from '../lib/gtag'
