@@ -9,6 +9,8 @@ export default function Home() {
     { type: "failover", src: "https://lon-cdn.livepeer.com/hls", status: "off" },
   ]);
 
+  const Background = "/cartela.png";
+
 
 
   useEffect(() => {
@@ -24,8 +26,8 @@ export default function Home() {
 
     */
 
-    const main = "3f82w8e75tfe09gg";
-    const failover = "49f6y2m5144phuf7";
+    const main = "2223dfsfy7aartu";
+    const failover = "d6d6dhc7y2eut5zf";
     initializeSources();
   }, [])
 
@@ -36,7 +38,7 @@ export default function Home() {
       initializeSources();
     }, 30000);
     return () => {
-      clearInterval(interval);
+      clearInterval();
     };
   }, [])
 
@@ -110,7 +112,12 @@ export default function Home() {
   // display renders for player 
   const renderNoSrc = () => {
     return (
-      <div className="bg-black h-full">
+      <div className="bg-black h-full"
+      style={{backgroundImage: "url(" + Background + ")",
+              backgroundRepeat: "no-repeat",
+              backgroundAttachment: "fixed",
+              backgroundPosition: "center"}}
+      >
         <p className="text-center text-white">El streaming esta offline</p>
       </div>
     )
@@ -129,7 +136,8 @@ export default function Home() {
   }
   
   return (
-    <div className="w-full h-screen">
+    <div className="w-full h-screen"
+    >
       {renderVideoPlayer()}
     </div>
 
