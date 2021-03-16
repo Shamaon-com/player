@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router'
 import VideoPlayerNew from '../components/videoPlayerNew'
 import axios from 'axios';
 
@@ -9,14 +8,14 @@ export default function Home() {
     { type: "failover", src: "https://lon-cdn.livepeer.com/hls", status: "off" },
   ]);
 
+  const main = "7d3f6s8wni80aa2e";
+  const failover = "0b6dfrf8ivv7buvw";
   const Background = "";
 
 
 
   useEffect(() => {
 
-    const main = "2223dfsfy7aartu";
-    const failover = "d6d6dhc7y2eut5zf";
     initializeSources();
   }, [])
 
@@ -32,12 +31,12 @@ export default function Home() {
   }, [])
 
   const initializeSources = () => {
-    const main = "https://fra-cdn.livepeer.com/hls/3f82w8e75tfe09gg/index.m3u8";
-    const failover = "https://lon-cdn.livepeer.com/hls/49f6y2m5144phuf7/index.m3u8";
+    const mainSrc = "https://fra-cdn.livepeer.com/hls/"+main+"/index.m3u8";
+    const failoverSrc = "https://lon-cdn.livepeer.com/hls/"+failover+"/index.m3u8";
     sources.map((item, index) => {
       const source = {
         type: item.type,
-        src: `${item.type === "master" ? main : failover}`,
+        src: `${item.type === "master" ? mainSrc : failoverSrc}`,
         status: 'pending'
       }
       fetchSourcePlaylist(source, index);
@@ -51,9 +50,11 @@ export default function Home() {
     var intermediate = sources;
     intermediate[index].src = source.src;
 
+    console.log("Requesting", source.src)
     axios.get(source.src).then(function(response){
       if(parseSourcePlaylist(response.data)){
-        intermediate[index].status = "available";
+        //intermediate[index].status === "available" ? intermediate[index].status = "active" : intermediate[index].status = "available";
+        intermediate[index].status = "available"
       }else{
         intermediate[index].status = "noOutput";
       }
@@ -101,20 +102,18 @@ export default function Home() {
   // display renders for player 
   const renderNoSrc = () => {
     return (
-      <div className="bg-black h-full"
-      style={{backgroundImage: "url(" + Background + ")",
-              backgroundRepeat: "no-repeat",
-              backgroundAttachment: "fixed",
-              backgroundPosition: "center"}}
+      <div
+        style={{
+          height: "100vh",
+          backgroundColor: "#000000"
+        }}
       >
-        <p className="text-center text-white">El streaming esta offline</p>
+        <p style={{margin: "0px", textAlign: "center", color: "#ffffff"}}>El streaming esta offline</p>
       </div>
     )
   }
 
   const renderVideoPlayer = () => {
-
-    console.log("trying to build player")
     console.log(sources)
     for (var i = 0; i < sources.length; i++) {
       if (sources[i].status === "available") {
@@ -125,8 +124,7 @@ export default function Home() {
   }
   
   return (
-    <div style={{height:"100vh", minHeight: "100vh"}}
-    >
+    <div style={{ widht:"100%"}}>
       {renderVideoPlayer()}
     </div>
 

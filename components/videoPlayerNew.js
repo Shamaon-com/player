@@ -13,7 +13,7 @@ export default function VideoPlayerNew(props) {
     const player = videojs(playerRef.current, { 
       
       controls: true, 
-      poster: "https://iframes-shamaon.s3-eu-west-1.amazonaws.com/cartelas/catela_eres.png", 
+      poster: "", 
       autoplay: false, muted: true }, () => {
         player.src({
           src: props.source.src,
@@ -35,9 +35,9 @@ export default function VideoPlayerNew(props) {
     });
 
     player.on(['error', 'durationchange', 'waiting'], function (data) {
-      //console.log(data)
+      console.log(data);
       //props.fetchSourcePlaylist(props.source, props.index);
-      props.initializeSources()
+      props.initializeSources();
     });
 
     return () => {

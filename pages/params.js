@@ -60,7 +60,7 @@ export default function Home() {
 
 
 
-  const fetchSourcePlaylist = (source, index) => {
+  const fetchSourcePlaylist = async (source, index) => {
     var intermediate = sources;
     intermediate[index].src = source.src;
 
