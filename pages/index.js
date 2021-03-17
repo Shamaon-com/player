@@ -31,7 +31,7 @@ export default function Home() {
   }, [])
 
   const initializeSources = () => {
-    const mainSrc = "https://fra-cdn.livepeer.com/hls/"+main+"/index.m3u8";
+    const mainSrc = "https://mdw-cdn.livepeer.com/hls/"+main+"/index.m3u8";
     const failoverSrc = "https://lon-cdn.livepeer.com/hls/"+failover+"/index.m3u8";
     sources.map((item, index) => {
       const source = {
