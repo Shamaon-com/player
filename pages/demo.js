@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import VideoPlayerNew from '../components/videoPlayerNew'
 import axios from 'axios';
+import { useRouter } from 'next/router';
 
 export default function Home() {
   const [sources, setSources] = useState([
     { type: "master", src: "https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8", status: "off" }
   ]);
+  const [cartela, setCartela ] = useState("");
+  const [background, setBackground] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+
+    const {cartela} = parseQuery(router.asPath.split("?")[1]);
+    console.log(cartela);
+    setCartela(cartela);
+    setBackground(`https://iframes-shamaon.s3-eu-west-1.amazonaws.com/cartelas/${cartela}`);
+  }, []);
 
 
   useEffect(() => {
@@ -95,10 +107,12 @@ export default function Home() {
   const renderNoSrc = () => {
     return (
       <div
-        style={{
-          height: "100vh",
-          backgroundColor: "#000000"
-        }}
+      style={{
+        height: "100vh",
+        backgroundImage: "url(" + background + ")",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover"
+      }}
       >
         <p style={{margin: "0px", textAlign: "center", color: "#ffffff"}}>El streaming esta offline</p>
       </div>
@@ -109,7 +123,7 @@ export default function Home() {
     console.log(sources)
     for (var i = 0; i < sources.length; i++) {
       if (sources[i].status === "available") {
-        return <VideoPlayerNew key={i} source={sources[i]} index={i} initializeSources={initializeSources} />
+        return <VideoPlayerNew key={i} source={sources[i]} index={i} initializeSources={initializeSources} cartela={cartela}/>
       }
     }
     return renderNoSrc();

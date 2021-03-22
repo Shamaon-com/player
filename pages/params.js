@@ -10,18 +10,21 @@ export default function Home() {
   ]);
   const [main, setMain] = useState("");
   const [failover, setFailover] = useState("");
-
+  const [cartela, setCartela] = useState("");
+  const [background, setBackground] = useState("");
   const router = useRouter();
 
-  const Background = "https://iframes-shamaon.s3-eu-west-1.amazonaws.com/cartelas/catela_eres.png";
 
   useEffect(() => {
 
-    const {main, failover} = parseQuery(router.asPath.split("?")[1]);
+    const {main, failover, cartela} = parseQuery(router.asPath.split("?")[1]);
 
     console.log(main, failover);
+    console.log(cartela);
 
     if(validate(main, failover)){
+      setCartela(cartela); 
+      setBackground(`https://iframes-shamaon.s3-eu-west-1.amazonaws.com/cartelas/${cartela}`);
       setMain(main); setFailover(failover);
     }
   }, []);
@@ -117,7 +120,7 @@ export default function Home() {
       <div 
         style={{
           height: "100vh",
-          backgroundImage: "url(" + Background + ")",
+          backgroundImage: "url(" + background + ")",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover"
         }}
@@ -134,7 +137,7 @@ export default function Home() {
     console.log(sources)
     for (var i = 0; i < sources.length; i++) {
       if (sources[i].status === "available") {
-        return <VideoPlayerNew key={i} source={sources[i]} index={i} initializeSources={initializeSources} />
+        return <VideoPlayerNew key={i} source={sources[i]} index={i} initializeSources={initializeSources} cartela={cartela}/>
       }
     }
     return renderNoSrc();
