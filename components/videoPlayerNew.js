@@ -13,7 +13,7 @@ export default function VideoPlayerNew(props) {
     const player = videojs(playerRef.current, { 
       
       controls: true, 
-      poster: "", 
+      poster: `https://iframes-shamaon.s3-eu-west-1.amazonaws.com/cartelas/${props.cartela}`, 
       autoplay: true}, () => {
         player.src({
           src: props.source.src,
