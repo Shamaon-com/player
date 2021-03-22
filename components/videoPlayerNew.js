@@ -14,7 +14,7 @@ export default function VideoPlayerNew(props) {
       
       controls: true, 
       poster: "", 
-      autoplay: true, muted: false }, () => {
+      autoplay: true}, () => {
         player.src({
           src: props.source.src,
           type: 'application/x-mpegURL',
