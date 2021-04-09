@@ -8,7 +8,7 @@ export default function Params() {
 
   const [ playbackIds, setPlaybackIds ] = useState([])
   const [ videojsOptions, setVideojsOptions ] = useState({})
-  const backup = ""; 
+  const [backup, setBackup] = useState(); 
   const router = useRouter();
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function Params() {
       autoplay: true,
       muted: false
    }
-
+    setBackup(backup)
     setPlaybackIds([main, failover]);
     setVideojsOptions(videojsOptions)
   }, [])
