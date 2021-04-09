@@ -14,7 +14,7 @@ export default function Params() {
   useEffect(() => {
     
 
-    const {main, failover, poster} = parseQuery(router.asPath.split("?")[1]);
+    const {main, failover, backup, poster} = parseQuery(router.asPath.split("?")[1]);
     console.log(main, failover, poster);
 
     const videojsOptions = {
