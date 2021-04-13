@@ -24,6 +24,7 @@ const livepeerHook = (
   
     const [sources, setSources] = useState<Source[]>([]);
     const [ currentActiveSource, setCurrentActiveSource ] = useState<Source>()
+    const [poll, setPoll] = useState(false);
     const edgeEndpoint: Array<string> = [
       "https://fra-cdn.livepeer.com/hls",
       "https://lon-cdn.livepeer.com/hls",
@@ -44,22 +45,46 @@ const livepeerHook = (
      * 
      */
     useEffect(() => {
+      
         const sorted = sortSources();
+        console.log(sorted)
         for (var i = 0; i < sorted.length; i++) {
             if (sorted[i].available) {
-                console.log("Current active source", sorted[i]);
-                setCurrentActiveSource(sorted[i]);
+                if(currentActiveSource !== sorted[i]){
+                  console.log("Current active source", sorted[i]);
+                  setCurrentActiveSource(sorted[i]);
+                } 
                 return;
             }
         }
-        setCurrentActiveSource(null)
+        console.log("No active source");
+        setCurrentActiveSource(null);
     }, [sources]);
+
+
+      /**
+   * Start polling to check if a source becomes active
+   * 
+   */
+       useEffect(() => {
+         console.log("Start polling")
+        if(!currentActiveSource){
+          const timer = setInterval(() => {
+            console.log("Sources are being polled");
+            checkForFailover();
+          }, 5500);
+          return () => clearInterval(timer);
+        };
+        console.log("Cleared polling")
+        return
+      }, [currentActiveSource])
 
 
     /**
      * 
      */
     const checkForFailover = async () => {
+
         playbackIds.forEach((element, index) => {
             const source: Source = {
                 order: index === 0 ? ranks.master : ranks.failover,
@@ -95,8 +120,10 @@ const livepeerHook = (
       }).catch((error) => {
         //console.log(error);
         source.available = false;
-        sources.splice(index, 1, source);
-        setSources([...sources]);
+        setSources((prevSources) => {
+          const result = prevSources.filter(prevSource => prevSource.src !== source.src)
+          return [...result, source]
+        });
       });
     };
   

@@ -19,77 +19,29 @@ const VideojsPlayer = ({
   backUpservice
 }) => {
 
-  const {currentActiveSource, checkForFailover}  = livepeerHook(playbackIds, backUpservice);
+  const { currentActiveSource, checkForFailover } = livepeerHook(playbackIds, backUpservice);
   const { event } = analytics('UA-167329045-2');
   const playerRef = useRef<HTMLVideoElement | null>(null)
-  
+
   const [currentState, setCurrentState] = useState("");
-  const [poll, setPoll] = useState(false);
-
-  /**
-   * Check if current stream is active
-   * 
-   */
-  useEffect(() => {
-    if( !currentActiveSource ) return
-    console.log(currentState)
-    event(currentState, currentActiveSource.src);
-    if(currentState === "waiting"){
-      const timer = setTimeout(() => {
-        checkForFailover();
-      }, 5500);
-      return () => clearTimeout(timer);
-    };
-    return
-  }, [currentState])
-  
-  /**
-   * Start polling to check if a source becomes active
-   * 
-   */
-     useEffect(() => {
-      if(poll){
-        const timer = setInterval(() => {
-          console.log("Sources are being polled")
-          checkForFailover();
-        }, 5500);
-        return () => clearInterval(timer);
-      };
-      return
-    }, [poll])
-
 
   useEffect(() => {
-    if( !currentActiveSource ) {
-      setPoll(true)
-      return
-    }
-    setPoll(false);
-    const player = videojs(playerRef.current, videojsOptions, () => {
-        player.src({
-          src: currentActiveSource.src,
-          type: 'application/x-mpegURL',
-        });
-      });
+    console.log("creating player")
+    const player = videojs(playerRef.current, videojsOptions)
 
     player.on(['firstplay'], () => {
       setCurrentState('playing');
     });
 
-    player.on(['waiting'], () => {
+    player.on(['waiting', 'ended', 'durationchange'], () => {
       setCurrentState('waiting');
     });
 
     player.on([
       'play',
-      'durationchange',
-      'stalled',
-      'ended',
-      'seeking',
-      'seeked',
       'playing',
-      'pause',
-      'volumechange'],
+      'seeking'
+    ],
       function (data) {
         setCurrentState(data.type);
       });
@@ -99,34 +51,48 @@ const VideojsPlayer = ({
       checkForFailover();
     });
 
-  }, [ currentActiveSource ]);
+  }, []);
+
+  /**
+   * Set source and play based on currentActiveSource
+   */
+  useEffect(() => {
+
+    if (!currentActiveSource) return
+    const player = videojs(playerRef.current).src({
+      src: currentActiveSource.src,
+      type: 'application/x-mpegURL',
+    });
+    player.play();
+  }, [currentActiveSource]);
 
 
 
-
-  const renderNoSource = () => {
-      return (
-        <div
-          style={{
-            height: "100%",
-            width: '100%',
-            backgroundColor: "#000000"
-          }}
-        >
-          <p style={{ margin: "0px", textAlign: "center", color: "#ffffff" }}>
-            El streaming esta offline
-          </p>
-        </div>
-      )
-  }
+  useEffect(() => {
+    if (!currentActiveSource) return
+    console.log("State change:", currentState);
+    event(currentState, currentActiveSource.src);
+    if (currentState === "waiting") {
+      console.log("SetTimeout active");
+      const timer = setTimeout(() => {
+        console.log("Checking for active source...");
+        event("FailoverTrigger", currentActiveSource.src)
+        checkForFailover();
+      }, 5500);
+      return () => {
+        clearTimeout(timer);
+      }
+    };
+    console.log("Cleared SetTimeout by", currentState);
+    return
+  }, [currentState]);
 
   return (
-    <div className={ styles.core }>
-      <video ref={playerRef} className="video-js vjs-fluid vjs-big-play-centered"/>
-      {!currentActiveSource && <img className={styles.overlay} src={videojsOptions.poster}/>}
+    <div className={styles.core}>
+      <video ref={playerRef} className="video-js vjs-fluid vjs-big-play-centered" />
+      {!currentActiveSource && <img className={styles.overlay} src={videojsOptions.poster} />}
     </div>
   )
-
 }
 
 export default VideojsPlayer
