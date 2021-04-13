@@ -26,8 +26,15 @@ const VideojsPlayer = ({
   const [currentState, setCurrentState] = useState("");
 
   useEffect(() => {
+
+    if(!currentActiveSource) return 
     console.log("creating player")
     const player = videojs(playerRef.current, videojsOptions)
+
+    player.src({
+      src: currentActiveSource.src,
+      type: 'application/x-mpegURL',
+    });
 
     player.on(['firstplay'], () => {
       setCurrentState('playing');
@@ -51,18 +58,9 @@ const VideojsPlayer = ({
       checkForFailover();
     });
 
-  }, []);
-
-  /**
-   * Set source and play based on currentActiveSource
-   */
-   useEffect(() => {
-    if (!currentActiveSource) return
-    videojs(playerRef.current).src({
-      src: currentActiveSource.src,
-      type: 'application/x-mpegURL',
-    });
   }, [currentActiveSource]);
+
+
 
 
 
