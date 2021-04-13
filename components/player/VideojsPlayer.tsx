@@ -56,14 +56,12 @@ const VideojsPlayer = ({
   /**
    * Set source and play based on currentActiveSource
    */
-  useEffect(() => {
-
+   useEffect(() => {
     if (!currentActiveSource) return
-    const player = videojs(playerRef.current).src({
+    videojs(playerRef.current).src({
       src: currentActiveSource.src,
       type: 'application/x-mpegURL',
     });
-    player.play();
   }, [currentActiveSource]);
 
 
