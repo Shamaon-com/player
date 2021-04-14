@@ -11,6 +11,7 @@ type videojsOptions = {
   poster: string,
   autoplay: boolean,
   muted: boolean
+  smoothQualityChange: boolean
 }
 
 const VideojsPlayer = ({
@@ -27,13 +28,16 @@ const VideojsPlayer = ({
 
   useEffect(() => {
 
-    if(!currentActiveSource) return 
-    console.log("creating player")
+    if (!currentActiveSource) return
+
+    console.log("creating player");
     const player = videojs(playerRef.current, videojsOptions)
 
-    player.src({
-      src: currentActiveSource.src,
-      type: 'application/x-mpegURL',
+    player.ready(function() {
+      this.src({
+        src: currentActiveSource.src,
+        type: 'application/x-mpegURL',
+      });
     });
 
     player.on(['firstplay'], () => {
@@ -61,9 +65,6 @@ const VideojsPlayer = ({
   }, [currentActiveSource]);
 
 
-
-
-
   useEffect(() => {
     if (!currentActiveSource) return
     console.log("State change:", currentState);
@@ -72,7 +73,7 @@ const VideojsPlayer = ({
       console.log("SetTimeout active");
       const timer = setTimeout(() => {
         console.log("Checking for active source...");
-        event("FailoverTrigger", currentActiveSource.src)
+        event("FailoverTrigger", currentActiveSource.src);
         checkForFailover();
       }, 5500);
       return () => {

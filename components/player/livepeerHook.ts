@@ -26,8 +26,8 @@ const livepeerHook = (
     const [ currentActiveSource, setCurrentActiveSource ] = useState<Source>()
     const [poll, setPoll] = useState(false);
     const edgeEndpoint: Array<string> = [
-      "https://fra-cdn.livepeer.com/hls",
-      "https://lon-cdn.livepeer.com/hls",
+      "https://cdn.livepeer.com/hls",
+      "https://cdn.livepeer.com/hls",
       "https://nyc-cdn.livepeer.com/hls",
       "https://mdw-cdn.livepeer.com/hls"
     ]
