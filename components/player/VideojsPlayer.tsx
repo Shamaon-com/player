@@ -5,7 +5,7 @@ import livepeerHook from './livepeerHook';
 import analytics from './analytics';
 import 'video.js/dist/video-js.css';
 import styles from './player.module.css'
-
+import LoadingOverlay from './LoadingOverlay';
 type videojsOptions = {
   controls: boolean,
   poster: string,
@@ -84,10 +84,11 @@ const VideojsPlayer = ({
     return
   }, [currentState]);
 
+  //<LoadingOverlay live={currentActiveSource ? true : false}/>
   return (
     <div className={styles.core}>
       <video ref={playerRef} className="video-js vjs-fluid vjs-big-play-centered" />
-      {!currentActiveSource && <img className={styles.overlay} src={videojsOptions.poster} />}
+      {!currentActiveSource && <div className={styles.overlay}> OFFLINE </div>}
     </div>
   )
 }
