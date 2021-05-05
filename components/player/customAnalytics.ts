@@ -61,20 +61,13 @@ const customAnalytics = (projectId:string) => {
 		// 	{ enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
 		// );
     
-        var ip = await axios.get("https://api.ipify.org?format=json").then((response) => {
-            return response.data.ip  
+        return await axios.get("https://api.ipgeolocation.io/ipgeo?apiKey=4b7f2f8e7c9c48a48eaaceb753aad91c").then((response) => {
+            return {ip:response.data.ip, state_prov: response.data.state_prov} 
         }).catch((e) => {
             console.log(e)
+            return {ip: "", state_prov: ""}
         })
-        console.log(ip)
-        var location = await axios.get(`https://api.ipstack.com/${ip}?access_key=d1385d7e6519612cdd7369e11cf48a76&format=1`).then((response) => {
-                console.log(response.data.region_name)
-                return response.data.region_name
-            }).catch((e) => {
-                console.log(e)
-                return ""
-            })
-        return {ip, location}
+       
 	};
     
     const getDeviceType = () => navigator.userAgent;
@@ -88,9 +81,10 @@ const customAnalytics = (projectId:string) => {
             userId: userId,
             pageUrl: getPageUrl(),
             deviceType: getDeviceType(),
-            location: locationData.location,
+            location: locationData.state_prov,
             ip: locationData.ip
         }
+        console.log(trackObject)
         return trackObject
     }
 
@@ -98,7 +92,6 @@ const customAnalytics = (projectId:string) => {
         var trackObject = await track()
         trackObject['eventType'] = eventType
         trackObject['eventValue'] = eventValue
-        console.log(trackObject)
         try{
             API.graphql(graphqlOperation(createAnalytic, { input: trackObject }));
             
