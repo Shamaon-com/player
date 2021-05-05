@@ -6,6 +6,9 @@ import analytics from './analytics';
 import 'video.js/dist/video-js.css';
 import styles from './player.module.css'
 import LoadingOverlay from './LoadingOverlay';
+import customAnalytics from './customAnalytics';
+
+
 type videojsOptions = {
   controls: boolean,
   poster: string,
@@ -22,6 +25,7 @@ const VideojsPlayer = ({
 
   const { currentActiveSource, checkForFailover } = livepeerHook(playbackIds, backUpservice);
   const { event } = analytics('UA-167329045-2');
+  const { trackEvent } = customAnalytics(playbackIds[0]);
   const playerRef = useRef<HTMLVideoElement | null>(null)
 
   const [currentState, setCurrentState] = useState("");
@@ -42,6 +46,7 @@ const VideojsPlayer = ({
 
     player.on(['firstplay'], () => {
       setCurrentState('playing');
+      trackEvent("firstplay", currentActiveSource.src)
     });
 
     player.on(['waiting', 'ended', 'durationchange'], () => {
@@ -74,6 +79,7 @@ const VideojsPlayer = ({
       const timer = setTimeout(() => {
         console.log("Checking for active source...");
         event("FailoverTrigger", currentActiveSource.src);
+        trackEvent("FailoverTrigger", currentActiveSource.src)
         checkForFailover();
       }, 5500);
       return () => {
@@ -85,10 +91,11 @@ const VideojsPlayer = ({
   }, [currentState]);
 
   //<LoadingOverlay live={currentActiveSource ? true : false}/>
+  //{!currentActiveSource && <div className={styles.overlay}> OFFLINE </div>}
   return (
     <div className={styles.core}>
       <video ref={playerRef} className="video-js vjs-fluid vjs-big-play-centered" />
-      {!currentActiveSource && <div className={styles.overlay}> OFFLINE </div>}
+      {!currentActiveSource && <img className={styles.overlay} src={"/cartela.jpeg"}/>}
     </div>
   )
 }

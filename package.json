@@ -8,13 +8,15 @@
     "start": "next start"
   },
   "dependencies": {
+    "aws-amplify": "^3.3.27",
     "axios": "^0.21.1",
     "i": "^0.3.6",
     "next": "^10.0.7",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-ga": "^3.3.0",
-    "styled-components": "^5.2.3"
+    "styled-components": "^5.2.3",
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@types/node": "^14.14.37",
