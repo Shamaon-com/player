@@ -67,7 +67,7 @@ const customAnalytics = (projectId:string) => {
             console.log(e)
         })
         console.log(ip)
-        var location = await axios.get(`http://api.ipstack.com/${ip}?access_key=d1385d7e6519612cdd7369e11cf48a76&format=1`).then((response) => {
+        var location = await axios.get(`https://api.ipstack.com/${ip}?access_key=d1385d7e6519612cdd7369e11cf48a76&format=1`).then((response) => {
                 console.log(response.data.region_name)
                 return response.data.region_name
             }).catch((e) => {
