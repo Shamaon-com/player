@@ -72,9 +72,9 @@ const customAnalytics = (projectId:string) => {
                 return response.data.region_name
             }).catch((e) => {
                 console.log(e)
-                return null
+                return ""
             })
-        return location
+        return {ip, location}
 	};
     
     const getDeviceType = () => navigator.userAgent;
@@ -82,12 +82,14 @@ const customAnalytics = (projectId:string) => {
 
     const track = async () => {
         console.log(userId)
+        const locationData  = await findLocation()
         const trackObject = {
             projectId: projectId,
             userId: userId,
             pageUrl: getPageUrl(),
             deviceType: getDeviceType(),
-            location: await findLocation()
+            location: locationData.location,
+            ip: locationData.ip
         }
         return trackObject
     }
