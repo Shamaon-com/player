@@ -5,7 +5,6 @@ import livepeerHook from './livepeerHook';
 import analytics from './analytics';
 import 'video.js/dist/video-js.css';
 import styles from './player.module.css'
-import LoadingOverlay from './LoadingOverlay';
 import customAnalytics from './customAnalytics';
 
 
