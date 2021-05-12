@@ -14,7 +14,8 @@
         "react": "17.0.1",
         "react-dom": "17.0.1",
         "react-ga": "^3.3.0",
-        "styled-components": "^5.2.3"
+        "styled-components": "^5.2.3",
+        "uuid": "^8.3.2"
     },
     "devDependencies": {
         "@types/node": "^14.14.37",
