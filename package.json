@@ -8,6 +8,7 @@
         "start": "next start"
     },
     "dependencies": {
+        "aws-amplify": "^4.0.0",
         "axios": "^0.21.1",
         "i": "^0.3.6",
         "next": "^10.0.7",
