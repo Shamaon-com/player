@@ -95,7 +95,7 @@ const VideojsPlayer = ({
   return (
     <div className={styles.core}>
       <video ref={playerRef} className="video-js vjs-fluid vjs-big-play-centered" />
-      {!currentActiveSource && <img className={styles.overlay} src={"/cartela.jpeg"}/>}
+      {!currentActiveSource && <img className={styles.overlay} src={videojsOptions.poster}/>}
     </div>
   )
 }
