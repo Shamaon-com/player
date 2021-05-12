@@ -10,7 +10,6 @@
   "dependencies": {
     "aws-amplify": "^3.3.27",
     "axios": "^0.21.1",
-    "i": "^0.3.6",
     "next": "^10.0.7",
     "react": "17.0.1",
     "react-dom": "17.0.1",
