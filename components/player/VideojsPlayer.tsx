@@ -6,7 +6,7 @@ import analytics from './analytics';
 import 'video.js/dist/video-js.css';
 import styles from './player.module.css'
 import customAnalytics from './customAnalytics';
-
+import "videojs-mux";
 
 type videojsOptions = {
   controls: boolean,
@@ -23,7 +23,7 @@ const VideojsPlayer = ({
 }) => {
 
   const { currentActiveSource, checkForFailover } = livepeerHook(playbackIds, backUpservice);
-  const { event } = analytics('UA-167329045-2');
+  //const { event } = analytics('UA-167329045-2');
   const { trackEvent } = customAnalytics(playbackIds[0]);
   const playerRef = useRef<HTMLVideoElement | null>(null)
 
@@ -34,7 +34,9 @@ const VideojsPlayer = ({
     if (!currentActiveSource) return
 
     console.log("creating player");
-    const player = videojs(playerRef.current, videojsOptions)
+    const player = videojs(
+      playerRef.current, 
+      videojsOptions)
 
     player.ready(function() {
       this.src({
@@ -72,12 +74,12 @@ const VideojsPlayer = ({
   useEffect(() => {
     if (!currentActiveSource) return
     console.log("State change:", currentState);
-    event(currentState, currentActiveSource.src);
+    //event(currentState, currentActiveSource.src); google analtytics
     if (currentState === "waiting") {
       console.log("SetTimeout active");
       const timer = setTimeout(() => {
         console.log("Checking for active source...");
-        event("FailoverTrigger", currentActiveSource.src);
+        // event("FailoverTrigger", currentActiveSource.src);
         trackEvent("FailoverTrigger", currentActiveSource.src)
         checkForFailover();
       }, 5500);

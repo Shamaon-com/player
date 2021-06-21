@@ -1,6 +1,6 @@
 import { useState, useEffect, useReducer} from 'react';
 import axios from 'axios';
-import uuid from 'uuid';
+import {v4 as uuid} from 'uuid';
 import { createAnalytic } from '../../src/graphql/mutations';
 import {API, graphqlOperation} from 'aws-amplify';
 
