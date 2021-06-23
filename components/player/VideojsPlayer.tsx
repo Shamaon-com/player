@@ -24,7 +24,7 @@ const VideojsPlayer = ({
 
   const { currentActiveSource, checkForFailover } = livepeerHook(playbackIds, backUpservice);
   //const { event } = analytics('UA-167329045-2');
-  const { trackEvent } = customAnalytics(playbackIds[0]);
+  //const { trackEvent } = customAnalytics(playbackIds[0]);
   const playerRef = useRef<HTMLVideoElement | null>(null)
 
   const [currentState, setCurrentState] = useState("");
@@ -47,7 +47,7 @@ const VideojsPlayer = ({
 
     player.on(['firstplay'], () => {
       setCurrentState('playing');
-      trackEvent("firstplay", currentActiveSource.src)
+      //trackEvent("firstplay", currentActiveSource.src)
     });
 
     player.on(['waiting', 'ended', 'durationchange'], () => {
@@ -80,7 +80,7 @@ const VideojsPlayer = ({
       const timer = setTimeout(() => {
         console.log("Checking for active source...");
         // event("FailoverTrigger", currentActiveSource.src);
-        trackEvent("FailoverTrigger", currentActiveSource.src)
+        //trackEvent("FailoverTrigger", currentActiveSource.src)
         checkForFailover();
       }, 5500);
       return () => {
