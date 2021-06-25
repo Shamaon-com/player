@@ -50,7 +50,8 @@ const VideojsPlayer = ({
       //trackEvent("firstplay", currentActiveSource.src)
     });
 
-    player.on(['waiting', 'ended', 'durationchange'], () => {
+    player.on(['waiting', 'ended', 'durationchange'], (event) => {
+      console.log(event)
       setCurrentState('waiting');
     });
 
@@ -63,6 +64,14 @@ const VideojsPlayer = ({
         setCurrentState(data.type);
       });
 
+
+      const allEvents = 'canplay canplaythrough emptied encrypted interruptbegin interruptend loadeddata loadedmetadata loadstart mozaudioavailable pause play playing progress ratechange seeked seeking stalled suspend timeupdate volumechange'
+
+      player.on([allEvents.split(' ')], function(data){
+        currentState !== data.type && console.log(data.type);
+        currentState !== data.type && setCurrentState(data.type);
+      })
+      
     player.on(['error'], function (data) {
       console.log(data.type);
       checkForFailover();
